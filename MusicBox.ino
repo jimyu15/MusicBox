@@ -13,6 +13,7 @@ void setup()
 	delay(100);
 	rtcInit();
 	tempInit();
+	playInit();
 
 }
 

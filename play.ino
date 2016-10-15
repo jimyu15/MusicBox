@@ -1,11 +1,12 @@
 #define MOTOR1 9
 #define MOTOR2 10
-#define SENSOR1 14
-#define SENSOR2 A2
-#define PLAYTIME 15000
+#define SENSOR1 A2
+#define SENSOR2 14
+#define PLAYTIME 30000
 
 uint32_t startTime;
-uint8_t playStat = 2;
+uint8_t playStat = 0;
+uint8_t sensorBuffer[2][30];
 
 void playInit()
 {
@@ -15,34 +16,84 @@ void playInit()
 	pinMode(SENSOR1, INPUT);
 	digitalWrite(MOTOR1, LOW);
 	digitalWrite(MOTOR2, LOW);
+	for (int i = 0; i < 10; i++)
+	{
+		sensorBuffer[0][i] = 0;
+		sensorBuffer[1][i] = 0;
+	}
 
+}
+
+uint8_t readSensor()
+{
+	uint8_t sum[2] = {0, 0};
+	for (int i = 29; i > 0; i--)
+	{
+		sum[0] += sensorBuffer[0][i];
+		sum[1] += sensorBuffer[1][i];
+		sensorBuffer[0][i] = sensorBuffer[0][i - 1];
+		sensorBuffer[1][i] = sensorBuffer[1][i - 1];
+	}
+	sensorBuffer[0][0] = digitalRead(SENSOR1);
+	sensorBuffer[1][0] = digitalRead(SENSOR2);
+	return (sum[1] == 29) * 2 + (sum[0] == 29);
+}
+
+uint8_t getPlayStat()
+{
+	if (playStat == 1)
+		playStat = 0;
+	return playStat;
+}
+
+void playOnce()
+{
+	if (playStat == 0)
+		playStat = 4;
+}
+
+void playLoop()
+{
+	if (playStat == 0)
+		playOnce();
 }
 
 void play()
 {
-	if (playStat == 0)
+	
+	switch(playStat)
 	{
+		case 4:
 		startTime = millis();
 		digitalWrite(MOTOR1, HIGH);
 		digitalWrite(MOTOR2, HIGH);
-		playStat = 1;
-	}
+		playStat = 3;
+		break;
 
-	if (playStat)
-	{
-		if (millis() - startTime > 1500)
+		case 3:
+		if (millis() - startTime > 6000)
 		{
-			if (digitalRead(SENSOR1) || millis() - startTime > PLAYTIME)
+			if (readSensor() & 1 || millis() - startTime > PLAYTIME)
 			{
 				digitalWrite(MOTOR1, LOW);
 				playStat = 2;
 			}
-			if (digitalRead(SENSOR2) || millis() - startTime > PLAYTIME)
-			{
-				digitalWrite(MOTOR2, LOW);
-				playStat = 3;
-			}
+			
 		}
+		break;
+
+		case 2:
+		if (readSensor() & 2 || millis() - startTime > PLAYTIME)
+		{
+			digitalWrite(MOTOR2, LOW);
+			playStat = 1;
+			playInit();
+		}
+		break;
+
+		default:
+		break;
+
 	}
 
 }

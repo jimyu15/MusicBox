@@ -28,7 +28,6 @@ int getTouchPos()
 
 void touchPoll()
 {
-	static uint8_t swiped = 2;
 	int touchRead = getTouchPos();
 	
 	if (touchPos == 0 && touchRead > 0)
@@ -42,14 +41,17 @@ void touchPoll()
 	{
 		if (millis() - touchTime > 20 && millis() - touchTime < 500)
 			touchStat = touchPos;
-		else if (millis() - touchTime > 2000 && millis() - touchTime < 50000)
-			touchStat = touchPos << 4;
-		swiped = 0;
+		touchPos = 0;
 	}
 
+	else if (touchPos > 0 && touchPos < 0x10 && millis() - touchTime > 2000)
+	{
+		touchStat = touchPos << 4;
+		touchPos = 0x10;
+	}
 
-	
-	touchPos = touchRead;
+	if (touchPos == 0)
+		touchPos = touchRead;
 
 }
 
@@ -58,5 +60,7 @@ uint8_t readTouch()
 	touchPoll();
 	uint8_t st = touchStat;
 	touchStat = 0;
+	if (st)
+		Serial.println(st);
 	return st;
 }

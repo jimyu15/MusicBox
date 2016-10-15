@@ -21,6 +21,11 @@ void setTime(int hr, int min, int sec)
 	rtc.adjust(now);
 }
 
+void setTime(DateTime tm)
+{
+	rtc.adjust(tm);
+}
+
 DateTime getTime()
 {
 	return rtc.now();
