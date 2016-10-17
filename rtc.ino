@@ -12,6 +12,7 @@ void rtcInit()
 	{
     	rtc.adjust(DateTime(2016, 10, 14, 20, 22, 55));
 	}
+	
 }
 
 void setTime(int hr, int min, int sec)

@@ -2,6 +2,8 @@
 #include <Adafruit_GFX.h>
 #include <Max72xxPanel.h>
 
+#define FRAME_CYCLE 60
+
 Max72xxPanel matrix = Max72xxPanel(4, 3, 1);
 
 const byte NUMBERS[][8] PROGMEM = {
@@ -328,4 +330,25 @@ void printAlarmHome(DateTime tm, uint8_t mode, uint8_t flash)
 	matrix.fillScreen(HIGH);
 	matrix.drawBitmap(18, 0, IMAGES[mode], 7, 8, LOW);
 	printTimeSmall(tm, flash, 0, 2);
+}
+
+void printText(String txt, uint8_t color, int x, int y)
+{
+	matrix.setCursor(x, y);
+	matrix.setTextColor(color, !color);
+	matrix.print(txt);
+}
+
+uint8_t scrollText(String txt, uint8_t color, uint32_t startTime)
+{
+	if (txt.length() * 6 + 48 < (millis() - startTime) / FRAME_CYCLE)
+	{
+		//Serial.print((int)sizeof(txt));
+		//Serial.println();
+		return 0;
+	}
+	matrix.fillScreen(!color);
+	printText(txt, color, 24 + (millis() - startTime) / FRAME_CYCLE * -1, 0);
+	matrix.write();
+	return 1;
 }

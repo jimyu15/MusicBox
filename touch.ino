@@ -44,7 +44,7 @@ void touchPoll()
 		touchPos = 0;
 	}
 
-	else if (touchPos > 0 && touchPos < 0x10 && millis() - touchTime > 2000)
+	else if (touchPos > 0 && touchPos < 0x10 && millis() - touchTime > 1500)
 	{
 		touchStat = touchPos << 4;
 		touchPos = 0x10;

@@ -1,12 +1,11 @@
 #include "RTClib.h"
 
 
+
 void setup()
 {
 	
 	Serial.begin(115200);
-
-	//while(!Serial);
 	matrixInit();
 	touchInit();
 	ledInit();
@@ -15,12 +14,18 @@ void setup()
 	tempInit();
 	playInit();
 
+	
+	randomInit();
+
+	
+
 }
 
 void loop()
 {
 	home();
 }
+
 
 
 void touch()

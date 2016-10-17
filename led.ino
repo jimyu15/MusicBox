@@ -13,6 +13,7 @@ void ledWrite(uint8_t state)
 {
 	for (int i = 0; i < 4; i++)
 	{
+		
 		digitalWrite(ledPin[i], state & 1);
 		state /= 2;
 	}
@@ -21,4 +22,12 @@ void ledWrite(uint8_t state)
 void ledWrite(uint8_t num, uint8_t state)
 {
 	digitalWrite(ledPin[num], state);
+}
+
+void alarmLed()
+{
+	if (getAlarmMode() > 0)
+	{
+		analogWrite(6, abs(map(millis() % 3000, 0, 3000, -255, 255)));
+	}
 }

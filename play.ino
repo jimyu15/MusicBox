@@ -2,7 +2,7 @@
 #define MOTOR2 10
 #define SENSOR1 A2
 #define SENSOR2 14
-#define PLAYTIME 30000
+#define PLAYTIME 40000
 
 uint32_t startTime;
 uint8_t playStat = 0;
@@ -36,7 +36,7 @@ uint8_t readSensor()
 	}
 	sensorBuffer[0][0] = digitalRead(SENSOR1);
 	sensorBuffer[1][0] = digitalRead(SENSOR2);
-	return (sum[1] == 29) * 2 + (sum[0] == 29);
+	return (sum[1] > 5) * 2 + (sum[0] == 29);
 }
 
 uint8_t getPlayStat()
@@ -76,23 +76,21 @@ void play()
 			if (readSensor() & 1 || millis() - startTime > PLAYTIME)
 			{
 				digitalWrite(MOTOR1, LOW);
-				playStat = 2;
+				playStat = 1;
 			}
 			
 		}
 		break;
 
-		case 2:
-		if (readSensor() & 2 || millis() - startTime > PLAYTIME)
+		default:
+		if (readSensor() & 2 || millis() - startTime > PLAYTIME + 10000)
 		{
 			digitalWrite(MOTOR2, LOW);
-			playStat = 1;
 			playInit();
 		}
 		break;
 
-		default:
-		break;
+		
 
 	}
 
